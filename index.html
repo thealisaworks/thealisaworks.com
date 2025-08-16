@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Tes Kepribadian by Alisa Hanya Untuk Seru Seruan</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background: #f5f5f5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        overflow-x: hidden;
+    }
+    .container {
+        background: #ffffff;
+        padding: 25px 35px;
+        border-radius: 20px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        text-align: center;
+        max-width: 800px;
+        width: 90%;
+        transition: 0.6s all ease;
+        opacity: 1;
+    }
+    h1 {
+        color: #555555;
+        margin-bottom: 20px;
+    }
+    .answer-btn {
+        display: flex;
+        align-items: center;
+        margin: 10px;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 15px;
+        background-color: #b0b0b0;
+        color: #ffffff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+        text-align: left;
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    .answer-btn img {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        margin-right: 15px;
+        object-fit: cover;
+    }
+    .answer-btn.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Game Tes Kepribadian by Alisa</h1>
+    <div id="question-container"></div>
+    <div id="answer-buttons"></div>
+</div>
+
+<!-- Sound efek -->
+<audio id="click-sound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
+<audio id="next-sound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
+<audio id="bg-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+
+<script>
+const questions = [
+    // 8 pertanyaan dengan 6 jawaban masing-masing
+    {
+        question: "Liburan idealmu lebih suka…",
+        answers: [
+            { text: "Naik gunung 🌄", type: "Serius", img: "https://i.ibb.co/q5s7hQm/mountain.jpg" },
+            { text: "Santai di pantai 🏖️", type: "Lucu", img: "https://i.ibb.co/3hH1z9J/beach.jpg" },
+            { text: "Jalan ke mall 🛍️", type: "Lucu", img: "https://i.ibb.co/9q4VYjR/mall.jpg" },
+            { text: "Pedesaan damai 🌾", type: "Serius", img: "https://i.ibb.co/3yQ2H0y/village.jpg" },
+            { text: "Staycation di kamar 🛏️", type: "Lucu", img: "https://i.ibb.co/0h4X4Z6/room.jpg" },
+            { text: "Cruise santai di laut 🚢", type: "Lucu", img: "https://i.ibb.co/HF8Vn1d/cruise.jpg" }
+        ]
+    },
+    {
+        question: "Suasana rumah yang bikin nyaman itu…",
+        answers: [
+            { text: "Rapi & minimalis 🪑", type: "Serius", img: "https://i.ibb.co/DfLJXZ7/minimalist.jpg" },
+            { text: "Penuh dekor lucu 🌈", type: "Lucu", img: "https://i.ibb.co/qx4t3bX/colorful.jpg" },
+            { text: "Dengan taman hijau 🌿", type: "Serius", img: "https://i.ibb.co/y8rJv2G/garden.jpg" },
+            { text: "Ruang keluarga ramai 🎉", type: "Lucu", img: "https://i.ibb.co/3mVhPZM/family.jpg" },
+            { text: "Dapur cozy 🍳", type: "Serius", img: "https://i.ibb.co/F5w5yMs/kitchen.jpg" },
+            { text: "Area baca & santai 📚", type: "Serius", img: "https://i.ibb.co/fd0n0R7/reading.jpg" }
+        ]
+    },
+    {
+        question: "Tempat favorit di rumahmu…",
+        answers: [
+            { text: "Kamar tidur 🛌", type: "Serius", img: "https://i.ibb.co/0h4X4Z6/room.jpg" },
+            { text: "Ruang tamu nyaman 🛋️", type: "Lucu", img: "https://i.ibb.co/3mVhPZM/family.jpg" },
+            { text: "Balkon dengan pemandangan 🌅", type: "Serius", img: "https://i.ibb.co/YRWqv7D/balcony.jpg" },
+            { text: "Dapur lucu & berwarna 🍲", type: "Lucu", img: "https://i.ibb.co/F5w5yMs/kitchen.jpg" },
+            { text: "Teras hijau 🌿", type: "Serius", img: "https://i.ibb.co/y8rJv2G/garden.jpg" },
+            { text: "Ruang hobi & main game 🎮", type: "Lucu", img: "https://i.ibb.co/k6qT9yL/gaming.jpg" }
+        ]
+    },
+    {
+        question: "Suasana kamar favoritmu…",
+        answers: [
+            { text: "Hening & wangi 📖", type: "Serius", img: "https://i.ibb.co/0h4X4Z6/room.jpg" },
+            { text: "Banyak poster & lampu warna-warni 🌈", type: "Lucu", img: "https://i.ibb.co/qx4t3bX/colorful.jpg" },
+            { text: "Cozy & hangat 🛏️", type: "Serius", img: "https://i.ibb.co/0h4X4Z6/room.jpg" },
+            { text: "Tempat main game 🎮", type: "Lucu", img: "https://i.ibb.co/k6qT9yL/gaming.jpg" },
+            { text: "Meja kerja rapi 🖊️", type: "Serius", img: "https://i.ibb.co/0sTZcFh/workspace.jpg" },
+            { text: "Area musik 🎵", type: "Lucu", img: "https://i.ibb.co/2y1gHsM/music.jpg" }
+        ]
+    },
+    {
+        question: "Kalau hangout, kamu lebih suka…",
+        answers: [
+            { text: "Bersantai di café ☕", type: "Serius", img: "https://i.ibb.co/9yCv9Tc/cafe.jpg" },
+            { text: "Main game bareng teman 🎮", type: "Lucu", img: "https://i.ibb.co/k6qT9yL/gaming.jpg" },
+            { text: "Jalan-jalan di mall 🛍️", type: "Lucu", img: "https://i.ibb.co/9q4VYjR/mall.jpg" },
+            { text: "Piknik di taman 🌳", type: "Serius", img: "https://i.ibb.co/YRWqv7D/balcony.jpg" },
+            { text: "Nonton film 🎬", type: "Lucu", img: "https://i.ibb.co/VVwshWZ/movie.jpg" },
+            { text: "Food trip & coba makanan baru 🍣", type: "Lucu", img: "https://i.ibb.co/N6Xf6zR/foodtrip.jpg" }
+        ]
+    },
+    {
+        question: "Vibes yang bikin kamu betah…",
+        answers: [
+            { text: "Alam & tenang 🌲", type: "Serius", img: "https://i.ibb.co/q5s7hQm/mountain.jpg" },
+            { text: "Ramai & penuh kejutan 🎊", type: "Lucu", img: "https://i.ibb.co/3mVhPZM/family.jpg" },
+            { text: "Santai & cozy 🛋️", type: "Lucu", img: "https://i.ibb.co/0h4X4Z6/room.jpg" },
+            { text: "Pemandangan indah 🌅", type: "Serius", img: "https://i.ibb.co/YRWqv7D/balcony.jpg" },
+            { text: "Kreatif & warna-warni 🎨", type: "Lucu", img: "https://i.ibb.co/qx4t3bX/colorful.jpg" },
+            { text: "Musik & pesta kecil 🎶", type: "Lucu", img: "https://i.ibb.co/2y1gHsM/music.jpg" }
+        ]
+    },
+    {
+        question: "Minuman favorit saat bersantai…",
+        answers: [
+            { text: "Teh hangat 🍵", type: "Serius", img: "https://i.ibb.co/9yCv9Tc/cafe.jpg" },
+            { text: "Kopi nikmat ☕", type: "Serius", img: "https://i.ibb.co/9yCv9Tc/cafe.jpg" },
+            { text: "Milkshake 🍨", type: "Lucu", img: "https://i.ibb.co/WsTQW7m/milkshake.jpg" },
+            { text: "Soda segar 🥤", type: "Lucu", img: "https://i.ibb.co/WsTQW7m/milkshake.jpg" },
+            { text: "Jus buah segar 🍹", type: "Lucu", img: "https://i.ibb.co/WsTQW7m/milkshake.jpg" },
+            { text: "Smoothie sehat 🥝", type: "Serius", img: "https://i.ibb.co/3p9s1G0/smoothie.jpg" }
+        ]
+    }
+];
+
+let currentQuestion = 0;
+let score = { Lucu: 0, Serius: 0 };
+
+const questionContainer = document.getElementById('question-container');
+const answerButtons = document.getElementById('answer-buttons');
+const clickSound = document.getElementById('click-sound');
+const nextSound = document.getElementById('next-sound');
+const bgMusic = document.getElementById('bg-music');
+
+bgMusic.volume = 0.2;
+bgMusic.play();
+
+function showQuestion() {
+    nextSound.play();
+    const q = questions[currentQuestion];
+    questionContainer.innerHTML = q.question;
+    answerButtons.innerHTML = '';
+    q.answers.forEach((answer, index) => {
+        const button = document.createElement('button');
+        button.classList.add('answer-btn');
+        button.innerHTML = `<img src="${answer.img}" alt="">${answer.text}`;
+        button.onclick = () => selectAnswer(answer.type);
+        answerButtons.appendChild(button);
+        setTimeout(() => button.classList.add('show'), 100 * index);
+    });
+}
+
+function selectAnswer(type) {
+    clickSound.play();
+    score[type]++;
+    currentQuestion++;
+    if(currentQuestion < questions.length) {
+        setTimeout(() => {
+            document.querySelector('.container').style.opacity = 0;
+            setTimeout(() => {
+                document.querySelector('.container').style.opacity = 1;
+                showQuestion();
+            }, 500);
+        }, 300);
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    questionContainer.innerHTML = "Hasil Tes Kepribadianmu!";
+    answerButtons.innerHTML = '';
+    let result = "";
+    if(score.Lucu > score.Serius) {
+        result = "Kamu tipe yang ceria dan penuh humor 😎😂";
+    } else if(score.Serius > score.Lucu) {
+        result = "Kamu tipe yang bijak dan tenang 🧐🌿";
+    } else {
+        result = "Kamu seimbang, lucu tapi juga bijak 😆🧠";
+    }
+    const p = document.createElement('p');
+    p.style.fontSize = "22px";
+    p.style.marginTop = "20px";
+    p.style.color = "#555555";
+    p.innerText = result;
+    answerButtons.appendChild(p);
+}
+
+showQuestion();
+</script>
+
+</body>
+</html>
